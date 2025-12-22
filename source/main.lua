@@ -5,10 +5,17 @@ import "CoreLibs/ui"
 import "Corelibs/sprites"
 import "Corelibs/graphics"
 import "Corelibs/animation"
+import "animatedimage"
 
 -- Localizing commonly used globals
 local gfx <const> = playdate.graphics
 local sprite <const> = gfx.sprite
+local geometry <const> = playdate.geometry
+
+local shyguy_image = AnimatedImage.new("shyguy.png", {delay = 50, loop = true})
+local shyguy_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
+local shyguy_speed = math.random(1, 5)
+local shyguy_scale = math.random(1, 4)
 
 local czImage = gfx.image.new("assets/Crankzilla_0")
 local czSprite = sprite.new(czImage)
@@ -45,9 +52,8 @@ init()
 function playdate.update()
 
     -- Clear screen
-    gfx.clear()
+    gfx.clear(gfx.kColorWhite)
 
-    gfx.sprite.update()
 
     -- Draw crank indicator if crank is docked
     if playdate.isCrankDocked() then
@@ -70,5 +76,20 @@ function playdate.update()
 
         -- Draw score
     gfx.drawTextAligned("SCORE 00000", 5, 5, kTextAlignment.left)
+
+    gfx.sprite.update()
+
+     -- Dustin anim stuff --
+	if shyguy_position.x < -100 then
+		shyguy_position.x = playdate.display.getWidth()
+		shyguy_position.y = math.random(10, 80)
+		shyguy_scale = math.random(1, 4)
+	end
+	shyguy_position.x -= shyguy_speed
+	
+	--gfx.clear(gfx.kColorWhite)
+	 shyguy_image:drawScaled(shyguy_position.x, shyguy_position.y, shyguy_scale)
+
+  
 
 end
