@@ -6,11 +6,14 @@ import "Corelibs/sprites"
 import "Corelibs/graphics"
 import "Corelibs/animation"
 import "animatedimage"
+import "Score"
 
 -- Localizing commonly used globals
 local gfx <const> = playdate.graphics
 local sprite <const> = gfx.sprite
 local geometry <const> = playdate.geometry
+
+local fontDefault <const> = gfx.getFont()
 
 local shyguy_image = AnimatedImage.new("shyguy.png", {delay = 50, loop = true})
 local shyguy_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
@@ -22,6 +25,8 @@ local czSprite = sprite.new(czImage)
 
 local myShackImage = gfx.image.new("assets/Shack_1")
 local myShack1Sprite = sprite.new(myShackImage)
+
+local score=0
 
 -- Defining player variables
 local playerSize = 20
@@ -36,7 +41,7 @@ local function init()
 
     myShack1Sprite:add()
     myShack1Sprite:moveTo(100,100)
-
+    myShack1Sprite:setCollideRect(0,0, myShack1Sprite:getSize())
 end
 
 -- Defining helper function
@@ -54,7 +59,6 @@ function playdate.update()
 
     -- Clear screen
     gfx.clear(gfx.kColorWhite)
-
 
     -- Draw crank indicator if crank is docked
     if playdate.isCrankDocked() then
@@ -75,9 +79,6 @@ function playdate.update()
     -- Draw player
     czSprite:moveTo(playerX, playerY)
 
-        -- Draw score
-    gfx.drawTextAligned("SCORE 00000", 5, 5, kTextAlignment.left)
-
     gfx.sprite.update()
 
      -- Dustin anim stuff --
@@ -87,10 +88,21 @@ function playdate.update()
 		shyguy_scale = math.random(1, 4)
 	end
 	shyguy_position.x -= shyguy_speed
-	
-	--gfx.clear(gfx.kColorWhite)
-	 shyguy_image:drawScaled(shyguy_position.x, shyguy_position.y, shyguy_scale)
+    shyguy_image:drawScaled(shyguy_position.x, shyguy_position.y, shyguy_scale)
 
-  
 
+     -- TEST COLLISION = increment score
+    local collisions = gfx.sprite.allOverlappingSprites()
+
+    for i = 1, #collisions do
+        local collisionPair = collisions[i]
+        local sprite1 = collisionPair[1]
+        local sprite2 = collisionPair[2]
+        -- do something with the colliding sprites
+
+        Score.update(1)
+    end
+
+    -- Draw score
+    fontDefault:drawTextAligned(tostring(Score.read()), 5, 5, kTextAlignment.left)
 end
