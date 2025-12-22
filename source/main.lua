@@ -32,6 +32,7 @@ local function init()
 
     czSprite:add()
     czSprite:moveTo(playerX,playerY)
+    czSprite:setCollideRect(0,0, czSprite:getSize())
 
     myShack1Sprite:add()
     myShack1Sprite:moveTo(100,100)
