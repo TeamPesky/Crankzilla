@@ -103,7 +103,7 @@ function playdate.update()
      CK_image:draw( playerX, playerY )
     end
 
-         -- TEST COLLISION = increment score
+    -- TEST COLLISION = increment score
     local collisions = CK_sprite.allOverlappingSprites()
     for i = 1, #collisions do
         local collisionPair = collisions[i]
