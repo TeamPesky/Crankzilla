@@ -15,33 +15,35 @@ local geometry <const> = playdate.geometry
 
 local fontDefault <const> = gfx.getFont()
 
-local shyguy_image = AnimatedImage.new("shyguy.png", {delay = 50, loop = true})
-local shyguy_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
-local shyguy_speed = math.random(1, 5)
-local shyguy_scale = math.random(1, 4)
-
-local czImage = gfx.image.new("assets/Crankzilla_0")
-local czSprite = sprite.new(czImage)
+local CK_image = AnimatedImage.new("CK.png", {delay = 250, loop = true})
+local CK_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
 
 local myShackImage = gfx.image.new("assets/Shack_1")
 local myShack1Sprite = sprite.new(myShackImage)
 
-local score=0
+local myTreeImage = gfx.image.new("assets/Trees")
+local myTreeSprite = sprite.new(myTreeImage)
+
+local myPylonImage = gfx.image.new("assets/Pylon")
+local myPylonSprite = sprite.new(myPylonImage)
 
 -- Defining player variables
-local playerSize = 20
 local playerVelocity = 1
 local playerX, playerY = 200, 120
 
 local function init()
 
-    czSprite:add()
-    czSprite:moveTo(playerX,playerY)
-    czSprite:setCollideRect(0,0, czSprite:getSize())
-
     myShack1Sprite:add()
     myShack1Sprite:moveTo(100,100)
     myShack1Sprite:setCollideRect(0,0, myShack1Sprite:getSize())
+
+    myTreeSprite:add()
+    myTreeSprite:moveTo(200,150)
+    myTreeSprite:setCollideRect(0,0, myTreeSprite:getSize())
+
+    myPylonSprite:add()
+    myPylonSprite:moveTo(70,25)
+    myPylonSprite:setCollideRect(0,0, myPylonSprite:getSize())
 end
 
 -- Defining helper function
@@ -60,6 +62,8 @@ function playdate.update()
     -- Clear screen
     gfx.clear(gfx.kColorWhite)
 
+    local movingRight = true
+
     -- Draw crank indicator if crank is docked
     if playdate.isCrankDocked() then
         playdate.ui.crankIndicator:draw()
@@ -72,37 +76,40 @@ function playdate.update()
         playerX += xVelocity
         playerY += yVelocity
         -- Loop player position
-        playerX = ring(playerX, -playerSize, 400 + playerSize)
-        playerY = ring(playerY, -playerSize, 240 + playerSize)
+        playerX = ring(playerX, -64, 400 + 64)
+        playerY = ring(playerY, -64, 240 + 64)
+
+        -- Flip CZ is moving left
+            if xVelocity < 0 then
+       movingRight = false
     end
 
-    -- Draw player
-    czSprite:moveTo(playerX, playerY)
+    end
 
     gfx.sprite.update()
 
-     -- Dustin anim stuff --
-	if shyguy_position.x < -100 then
-		shyguy_position.x = playdate.display.getWidth()
-		shyguy_position.y = math.random(10, 80)
-		shyguy_scale = math.random(1, 4)
-	end
-	shyguy_position.x -= shyguy_speed
-    shyguy_image:drawScaled(shyguy_position.x, shyguy_position.y, shyguy_scale)
+    -- Player
+	CK_position.x -= playerVelocity
 
+    if movingRight then
+     CK_image:draw( playerX, playerY, "flipX" )
+    else
+     CK_image:draw( playerX, playerY )
+    end
 
      -- TEST COLLISION = increment score
     local collisions = gfx.sprite.allOverlappingSprites()
-
     for i = 1, #collisions do
         local collisionPair = collisions[i]
         local sprite1 = collisionPair[1]
         local sprite2 = collisionPair[2]
         -- do something with the colliding sprites
+        sprite2:setCollisionsEnabled(false)
 
         Score.update(1)
     end
 
     -- Draw score
     fontDefault:drawTextAligned(tostring(Score.read()), 5, 5, kTextAlignment.left)
+
 end
