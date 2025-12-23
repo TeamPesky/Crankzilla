@@ -16,7 +16,9 @@ local geometry <const> = playdate.geometry
 local fontDefault <const> = gfx.getFont()
 
 local CK_image = AnimatedImage.new("CK.png", {delay = 250, loop = true})
+local CK_sprite = gfx.sprite.new(CK_image)
 local CK_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
+
 
 local myShackImage = gfx.image.new("assets/Shack_1")
 local myShack1Sprite = sprite.new(myShackImage)
@@ -29,16 +31,21 @@ local myPylonSprite = sprite.new(myPylonImage)
 
 -- Defining player variables
 local playerVelocity = 1
-local playerX, playerY = 200, 120
+local playerX, playerY = 10, 180
 
 local function init()
+
+    CK_sprite:add()
+    CK_sprite:setCollideRect(0,0, CK_image:getSize())
+    CK_sprite:moveWithCollisions( CK_position.x, CK_position.y )
+    CK_sprite.collisionResponse = gfx.sprite.kCollisionTypeOverlap
 
     myShack1Sprite:add()
     myShack1Sprite:moveTo(100,100)
     myShack1Sprite:setCollideRect(0,0, myShack1Sprite:getSize())
 
     myTreeSprite:add()
-    myTreeSprite:moveTo(200,150)
+    myTreeSprite:moveTo(100,150)
     myTreeSprite:setCollideRect(0,0, myTreeSprite:getSize())
 
     myPylonSprite:add()
@@ -83,13 +90,12 @@ function playdate.update()
             if xVelocity < 0 then
        movingRight = false
     end
-
     end
 
     gfx.sprite.update()
 
     -- Player
-	CK_position.x -= playerVelocity
+    CK_sprite:moveWithCollisions( playerX, playerY )
 
     if movingRight then
      CK_image:draw( playerX, playerY, "flipX" )
@@ -97,14 +103,14 @@ function playdate.update()
      CK_image:draw( playerX, playerY )
     end
 
-     -- TEST COLLISION = increment score
-    local collisions = gfx.sprite.allOverlappingSprites()
+         -- TEST COLLISION = increment score
+    local collisions = CK_sprite.allOverlappingSprites()
     for i = 1, #collisions do
         local collisionPair = collisions[i]
         local sprite1 = collisionPair[1]
         local sprite2 = collisionPair[2]
         -- do something with the colliding sprites
-        sprite2:setCollisionsEnabled(false)
+       --sprite1:setCollisionsEnabled(false)
 
         Score.update(1)
     end
