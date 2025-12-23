@@ -110,7 +110,7 @@ function playdate.update()
         local sprite1 = collisionPair[1]
         local sprite2 = collisionPair[2]
         -- do something with the colliding sprites
-       --sprite1:setCollisionsEnabled(false)
+       sprite1:setCollisionsEnabled(false)
 
         Score.update(1)
     end
