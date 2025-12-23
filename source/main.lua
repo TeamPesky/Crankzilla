@@ -19,7 +19,6 @@ local CK_image = AnimatedImage.new("CK.png", {delay = 250, loop = true})
 local CK_sprite = gfx.sprite.new(CK_image)
 local CK_position = geometry.point.new(playdate.display.getWidth(), math.random(10, 80))
 
-
 local myShackImage = gfx.image.new("assets/Shack_1")
 local myShack1Sprite = sprite.new(myShackImage)
 
@@ -29,11 +28,16 @@ local myTreeSprite = sprite.new(myTreeImage)
 local myPylonImage = gfx.image.new("assets/Pylon")
 local myPylonSprite = sprite.new(myPylonImage)
 
+local razedImage = gfx.image.new("assets/Razed")
+local razedSprite = sprite.new(razedImage)
+
 -- Defining player variables
 local playerVelocity = 1
 local playerX, playerY = 10, 180
 
 local function init()
+
+    razedSprite:add()
 
     CK_sprite:add()
     CK_sprite:setCollideRect(0,0, CK_image:getSize())
@@ -51,6 +55,7 @@ local function init()
     myPylonSprite:add()
     myPylonSprite:moveTo(70,25)
     myPylonSprite:setCollideRect(0,0, myPylonSprite:getSize())
+
 end
 
 -- Defining helper function
@@ -104,13 +109,34 @@ function playdate.update()
     end
 
     -- TEST COLLISION = increment score
+
+    local positionX,positionY,collisionsP,lengthP = CK_sprite:checkCollisions(CK_sprite.x,CK_sprite.y)
+
+	-- print the name of all objects on screen that the player is colliding with
+	if lengthP>0 then
+				
+		for i=1,lengthP do
+			local object = collisionsP[i].other
+			gfx.drawText("Collision with ".. tostring(object.name) , 250, 20 * i)			
+		end
+
+	end
+
     local collisions = CK_sprite.allOverlappingSprites()
     for i = 1, #collisions do
+       
         local collisionPair = collisions[i]
-        local sprite1 = collisionPair[1]
-        local sprite2 = collisionPair[2]
-        -- do something with the colliding sprites
-       sprite1:setCollisionsEnabled(false)
+        local sprite1 = collisionPair[1] -- CZ has hit this
+        local sprite2 = collisionPair[2] -- this is CZ
+        local positionX = sprite1.x
+        local positionY = sprite1.y
+    
+        sprite1:setCollisionsEnabled(false)
+        -- sprite1:setImage(razedImage)
+        --sprite1.removeSprite(sprite1)
+
+        local newRazedSprite = sprite.new(razedImage)
+        --newRazedSprite:moveTo(positionX, positionY)
 
         Score.update(1)
     end
